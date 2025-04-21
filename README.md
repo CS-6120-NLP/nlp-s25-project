@@ -6,3 +6,9 @@ This service provides a RAG-based Q&A for **Northeastern University (NU)**, with
 - Conversation memory per session
 - Incremental Chroma DB persistence
 - Simple Streamlit UI
+
+Backend:
+- `uvicorn app.main:app --reload`
+
+Frontend:
+- `streamlit run ui/streamlit_app.py`
