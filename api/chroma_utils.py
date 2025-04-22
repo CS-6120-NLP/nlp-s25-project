@@ -63,7 +63,7 @@ def retriever4_hyde(query: str):
     def HydeRagSystem(model_name, query):
         llm = ChatGoogleGenerativeAI(
             model="gemini-2.0-flash",
-            google_api_key="AIzaSyCTrWqpLmSjc5acAQtsKU55kEJyq7HDJ9I",  # safer than hardcoding
+            google_api_key=os.getenv("GOOGLE_API_KEY"),  # safer than hardcoding
             temperature=1
         )
 
