@@ -8,6 +8,7 @@ from api.langchain_utils import build_conversational_chain
 from api.persona_utils import filter_by_persona
 from api.db_utils import get_db_session
 from api.db_models import QueryRecord
+from config.default_settings import LATEST_CHAT_HISTORY
 
 router = APIRouter()
 
@@ -29,13 +30,14 @@ def query_endpoint(payload: QueryRequest):
     docs = retriever.get_relevant_documents(clarified)
 
     # Answer
+    db = get_db_session()
     chain = build_conversational_chain(store)
-    result = chain({"question": clarified, "chat_history": []})
+    chat_hist = get_chat_history(db,session.id)
+    result = chain({"question": clarified, "chat_history": chat_hist})
     answer = result.get("answer", "")
     confidence = float(result.get("score", 0.0))
 
     # Persist query record
-    db = get_db_session()
     record = QueryRecord(
         session_id=session.id,
         raw_query=payload.query,
@@ -46,4 +48,14 @@ def query_endpoint(payload: QueryRequest):
     db.add(record)
     db.commit()
 
-    return QueryResponse(answer=answer, confidence=confidence)
+    # return QueryResponse(answer=answer, confidence=confidence)
+    return QueryResponse(answer= "test1",confidence= 90)
+
+def get_chat_history(db, session_id, limit=LATEST_CHAT_HISTORY):
+    """
+    Retrieve the 40 latest chat history records from the database for a given session_id.
+    """
+    return (db.query(QueryRecord)
+            .filter(QueryRecord.session_id == session_id)
+            .order_by(QueryRecord.id.desc())
+            .limit(limit).all())
