@@ -1,6 +1,6 @@
 # api/db_models.py
 
-from sqlalchemy import Column, Integer, String, DateTime, func, ForeignKey, JSON
+from sqlalchemy import Column, Integer, String, DateTime, func, ForeignKey, JSON, Text
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
 
@@ -13,6 +13,7 @@ class UserSession(Base):
     session_id = Column(String, unique=True, nullable=False)
     persona = Column(String, nullable=False)
     created_at = Column(DateTime, server_default=func.now())
+    chat_summary = Column(Text, nullable=True)
     queries = relationship('QueryRecord', back_populates='session')
 
 
