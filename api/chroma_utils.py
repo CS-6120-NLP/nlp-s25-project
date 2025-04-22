@@ -63,7 +63,6 @@ def retriever4_hyde(query: str):
     def HydeRagSystem(model_name, query):
         llm = ChatGoogleGenerativeAI(
             model="gemini-2.0-flash",
-            google_api_key="AIzaSyCTrWqpLmSjc5acAQtsKU55kEJyq7HDJ9I",  # safer than hardcoding
             temperature=1
         )
 
@@ -92,10 +91,9 @@ def hybrid_query_model(query):
     retr3 = retriever3_page_chunks(query)
     retr4, hyde_doc = retriever4_hyde(query)
     #Re-ranker
-    api_key = "GHHT2VIuCIBah8E3MxuuiXBsCOZU6OHI4ENCQShx"
-    
+
     import cohere
-    co = cohere.ClientV2(api_key=api_key)
+    co = cohere.ClientV2(api_key=os.getenv("COHERE_API_KEY"))
     overall_documents=retr1[0] + retr2[0] + retr3[0] + retr4[0]
     overall_documents = list(set(overall_documents))
     result = co.rerank(model='rerank-english-v2.0', query=query, documents=overall_documents, top_n=5)
