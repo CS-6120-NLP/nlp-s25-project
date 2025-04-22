@@ -26,6 +26,7 @@ var/
 .venv
 venv/
 ENV/
+nlp-venv/
 
 # JavaScript/TypeScript/React
 node_modules/
