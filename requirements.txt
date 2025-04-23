@@ -2,12 +2,13 @@ fastapi
 uvicorn
 python-multipart
 langchain
+langchain-core
 langchain-community
 chromadb
 sqlalchemy
 alembic
 python-dotenv
-openai
+pydantic
 unstructured
 psycopg2-binary
 streamlit

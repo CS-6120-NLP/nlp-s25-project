@@ -1,6 +1,8 @@
 import json
-from api.db_utils import get_db_session
-from api.db_models import UnpermittedQuery, PermittedQuery
+
+from models.entities import UnpermittedQuery, PermittedQuery
+from utils.database import get_db_session
+
 
 def seed():
     with open("permission_data.json") as f:
