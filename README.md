@@ -7,8 +7,22 @@ This service provides a RAG-based Q&A for **Northeastern University (NU)**, with
 - Incremental Chroma DB persistence
 - Simple Streamlit UI
 
+## Run Locally
+### Without Docker
+
+Set up environmental variables:
+```python
+import os
+from dotenv import load_dotenv
+load_dotenv(dotenv_path=os.path.abspath(".env"))
+```
+
 Backend:
-- `uvicorn app.main:app --reload`
+```bash
+uvicorn app.main:app --reload
+```
 
 Frontend:
-- `streamlit run ui/streamlit_app.py`
+```bash
+streamlit run ui/streamlit_app.py
+```

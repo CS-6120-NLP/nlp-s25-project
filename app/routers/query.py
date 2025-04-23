@@ -6,7 +6,7 @@ from api.permission_utils import PermissionChecker
 # from api.chroma_utils import get_chroma_store
 # from api.langchain_utils import build_conversational_chain
 from api.persona_utils import filter_by_persona
-from api.db_utils import get_db_session
+from api.db_utils import get_db_session, get_chat_history, save_chat_message, save_query_record
 from api.db_models import QueryRecord
 from api.chroma_utils import final_retriever
 from api.langchain_utils import run_llm_response
@@ -18,40 +18,23 @@ def query_endpoint(payload: QueryRequest):
     # Session/auth
     session = get_or_create_session(payload.persona, payload.session_id)
 
+    # Retrieve chat history
+    chat_history = [{"role": msg.role, "content": msg.content} for msg in get_chat_history(session.id)]
+
     # Enrich + permission
     clarified = clarify_query(payload.query)
-    # checker = PermissionChecker()
-    # if not checker.is_permitted(clarified):
-    #     raise HTTPException(status_code=403, detail="Query not permitted.")
 
     # Retrieve + filter
-    # store = get_chroma_store()
-    # retriever = store.as_retriever(search_kwargs={"k": 5})
-    # retriever = filter_by_persona(retriever, payload.persona)
-    # docs = retriever.get_relevant_documents(clarified)
     context, source = final_retriever(clarified)
 
-
-
-    # Answer
-    # chain = build_conversational_chain(store)
-    # result = chain({"question": clarified, "chat_history": []})
-    # answer = result.get("answer", "")
-    # confidence = float(result.get("score", 0.0))
-    result = run_llm_response(clarified, context, source)
+    # Answer with chat history
+    result = run_llm_response(clarified, context, source, chat_history)
     answer = result.content if isinstance(result.content, str) else str(result.content)
     confidence = 0.9
 
-    # Persist query record
-    db = get_db_session()
-    record = QueryRecord(
-        session_id=session.id,
-        raw_query=payload.query,
-        clarified_query=clarified,
-        answer=answer,
-        confidence=confidence
-    )
-    db.add(record)
-    db.commit()
+    # Persistent record
+    save_query_record(session.id, payload.query, clarified, answer, confidence)
+    save_chat_message(session.id, "user", payload.query)
+    save_chat_message(session.id, "assistant", answer)
 
     return QueryResponse(answer=answer, confidence=confidence)

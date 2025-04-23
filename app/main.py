@@ -4,11 +4,6 @@ from app.routers.query import router as query_router
 from app.routers.session import router as session_router
 from app.routers.documents import router as docs_router
 
-# From .env import environment variables
-import os
-from dotenv import load_dotenv
-load_dotenv(dotenv_path=os.path.abspath(".env"))
-
 # Initialize database tables
 init_db()
 

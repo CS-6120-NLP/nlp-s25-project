@@ -14,6 +14,7 @@ class UserSession(Base):
     persona = Column(String, nullable=False)
     created_at = Column(DateTime, server_default=func.now())
     queries = relationship('QueryRecord', back_populates='session')
+    chat_history = relationship('ChatHistory', back_populates='session', cascade="all, delete-orphan")
 
 
 class QueryRecord(Base):
@@ -26,6 +27,16 @@ class QueryRecord(Base):
     confidence = Column(String)
     timestamp = Column(DateTime, server_default=func.now())
     session = relationship('UserSession', back_populates='queries')
+
+
+class ChatHistory(Base):
+    __tablename__ = 'chat_history'
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    session_id = Column(Integer, ForeignKey('user_sessions.id'), nullable=False)
+    role = Column(String, nullable=False)  # "user" or "assistant"
+    content = Column(String, nullable=False)
+    timestamp = Column(DateTime, server_default=func.now())
+    session = relationship('UserSession', back_populates='chat_history')
 
 
 class Document(Base):
