@@ -26,6 +26,7 @@ var/
 .venv
 venv/
 ENV/
+nlp-venv/
 
 # JavaScript/TypeScript/React
 node_modules/
@@ -45,11 +46,6 @@ coverage/
 *.swp
 *.swo
 
-# Database
-*.sqlite
-*.db
-chroma_db/
-
 # Logs
 logs/
 *.log
@@ -65,3 +61,7 @@ logs/
 
 #Dev Folders
 .devcontainer/
+
+#DB
+.db/
+nu_chatbot.db
