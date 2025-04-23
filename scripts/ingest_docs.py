@@ -1,10 +1,13 @@
 import os
-from langchain_community.document_loaders import UnstructuredPDFLoader, TextLoader, UnstructuredWordDocumentLoader
+
 from langchain.text_splitter import RecursiveCharacterTextSplitter
+from langchain_community.document_loaders import UnstructuredPDFLoader, TextLoader, UnstructuredWordDocumentLoader
 from langchain_community.embeddings import OpenAIEmbeddings
 from langchain_community.vectorstores import Chroma
-from api.db_utils import get_db_session
-from api.db_models import Document as DocumentModel
+
+from models.entities import Document as DocumentModel
+from utils.db_utils import get_db_session
+
 
 def ingest(input_dir="docs", persist_dir="chroma_db"):
     docs = []

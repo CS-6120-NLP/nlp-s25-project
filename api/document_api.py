@@ -1,12 +1,14 @@
-from fastapi import APIRouter, UploadFile, File, Form, HTTPException
-from typing import List, Literal
 import os
-from api.db_utils import get_db_session
-from api.db_models import Document as DBDocument
-from langchain_community.document_loaders import UnstructuredPDFLoader, TextLoader, UnstructuredWordDocumentLoader
+from typing import List, Literal
+
+from fastapi import APIRouter, UploadFile, File, Form, HTTPException
 from langchain.text_splitter import RecursiveCharacterTextSplitter
+from langchain_community.document_loaders import UnstructuredPDFLoader, TextLoader, UnstructuredWordDocumentLoader
 from langchain_community.embeddings import OpenAIEmbeddings
 from langchain_community.vectorstores import Chroma
+
+from models.entities import Document as DBDocument
+from utils.db_utils import get_db_session
 
 router = APIRouter()
 

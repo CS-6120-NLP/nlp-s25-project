@@ -8,7 +8,7 @@ This service provides a RAG-based Q&A for **Northeastern University (NU)**, with
 - Simple Streamlit UI
 
 Backend:
-- `uvicorn app.main:app --reload`
+- `uvicorn main:app --reload`
 
 Frontend:
 - `streamlit run ui/streamlit_app.py`

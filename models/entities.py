@@ -1,4 +1,4 @@
-# api/db_models.py
+# services/entities.py
 
 from sqlalchemy import Column, Integer, String, DateTime, func, ForeignKey, JSON
 from sqlalchemy.ext.declarative import declarative_base
@@ -36,15 +36,3 @@ class Document(Base):
     extension = Column(String, nullable=False)
     persona_tags = Column(JSON, nullable=False)
     uploaded_at = Column(DateTime, server_default=func.now())
-
-
-class UnpermittedQuery(Base):
-    __tablename__ = 'unpermitted_queries'
-    id = Column(Integer, primary_key=True)
-    pattern = Column(String, nullable=False)
-
-
-class PermittedQuery(Base):
-    __tablename__ = 'permitted_queries'
-    id = Column(Integer, primary_key=True)
-    pattern = Column(String, nullable=False)

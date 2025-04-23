@@ -1,8 +1,11 @@
 from fastapi import APIRouter
-from api.pydantic_models import SessionRequest, SessionResponse
-from api.auth_utils import get_or_create_session
+
+from models.request_models import SessionRequest
+from models.response_models import SessionResponse
+from utils.auth_utils import get_or_create_session
 
 router = APIRouter()
+
 
 @router.post("", response_model=SessionResponse)
 def session_endpoint(payload: SessionRequest):

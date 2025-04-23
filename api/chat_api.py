@@ -1,17 +1,18 @@
-from fastapi import APIRouter, HTTPException
-from api.pydantic_models import QueryRequest, QueryResponse
-from api.auth_utils import get_or_create_session
-from api.enrichment_utils import clarify_query
-from api.permission_utils import PermissionChecker
-# from api.chroma_utils import get_chroma_store
-# from api.langchain_utils import build_conversational_chain
-from api.persona_utils import filter_by_persona
-from api.db_utils import get_db_session
-from api.db_models import QueryRecord
-from api.chroma_utils import final_retriever
-from api.langchain_utils import run_llm_response
+from fastapi import APIRouter
+
+from models.entities import QueryRecord
+from models.request_models import QueryRequest
+from models.response_models import QueryResponse
+from services.chat_service import clarify_query
+from services.llm_service import run_llm_response
+from services.retrieval_service import final_retriever
+from utils.auth_utils import get_or_create_session
+# from services.chroma_utils import get_chroma_store
+# from services.langchain_utils import build_conversational_chain
+from utils.db_utils import get_db_session
 
 router = APIRouter()
+
 
 @router.post("", response_model=QueryResponse)
 def query_endpoint(payload: QueryRequest):
@@ -30,8 +31,6 @@ def query_endpoint(payload: QueryRequest):
     # retriever = filter_by_persona(retriever, payload.persona)
     # docs = retriever.get_relevant_documents(clarified)
     context, source = final_retriever(clarified)
-
-
 
     # Answer
     # chain = build_conversational_chain(store)
