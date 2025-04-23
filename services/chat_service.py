@@ -31,13 +31,13 @@ prompt = PromptTemplate(template=template, input_variables=["query"])
 def clarify_query(query, chat_history):
     """Clarify and rewrite the user query to be more precise."""
     llm = get_llm()
-    chain = prompt | llm
 
     formatted_history = "\n".join(
         f"{message['role'].capitalize()}: {message['content']}" for message in chat_history
     )
 
-    return chain.invoke({"query": query, "chat_history": formatted_history}).content.strip()
+    input_text = prompt.format(query=query, chat_history=formatted_history)
+    return llm.invoke(input_text).content.strip()
 
 
 def process_chat(session_id, raw_query, session):

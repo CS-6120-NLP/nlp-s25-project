@@ -27,6 +27,7 @@ st.header("Chat History")
 if "chat_history" not in st.session_state:
     st.session_state["chat_history"] = []
 
+placeholder = st.empty()
 if st.session_state["chat_history"]:
     for message in st.session_state["chat_history"]:
         if message["role"] == "user":
@@ -34,10 +35,13 @@ if st.session_state["chat_history"]:
         else:
             st.markdown(f"**Assistant:** {message['content']}")
 else:
-    st.write("(No chat history yet)")
+    placeholder.text("(No chat history yet.)")
 
 if response:
     if query.strip():
+        # Clear the placeholder
+        placeholder.empty()
+
         # Add user message to chat history
         st.session_state["chat_history"].append({"role": "user", "content": query})
         st.write("**You:**", query)
@@ -53,7 +57,6 @@ if response:
             data = res.json()
             bot_response = data.get("answer", "No response")
             st.session_state["chat_history"].append({"role": "assistant", "content": bot_response})
-            st.write(bot_response)
-            st.write(f"Confidence: {data['confidence']:.2f}")
+            st.markdown(f"**Assistant:** {bot_response} [Confidence: {data.get('confidence', 'N/A')}]")
         else:
             st.error(res.text)
