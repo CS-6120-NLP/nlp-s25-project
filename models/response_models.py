@@ -3,7 +3,7 @@ from typing import Literal
 from pydantic import BaseModel
 
 
-class QueryResponse(BaseModel):
+class ChatResponse(BaseModel):
     answer: str
     confidence: float
 

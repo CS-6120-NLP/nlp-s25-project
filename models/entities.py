@@ -1,6 +1,7 @@
 # services/entities.py
+from datetime import datetime, timezone
 
-from sqlalchemy import Column, Integer, String, DateTime, func, ForeignKey, JSON
+from sqlalchemy import Column, Integer, String, DateTime, func, ForeignKey, JSON, Float
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
 
@@ -13,19 +14,19 @@ class UserSession(Base):
     session_id = Column(String, unique=True, nullable=False)
     persona = Column(String, nullable=False)
     created_at = Column(DateTime, server_default=func.now())
-    queries = relationship('QueryRecord', back_populates='session')
+    chats = relationship('ChatRecord', back_populates='session')
 
 
-class QueryRecord(Base):
-    __tablename__ = 'query_records'
-    id = Column(Integer, primary_key=True)
-    session_id = Column(Integer, ForeignKey('user_sessions.id'))
-    raw_query = Column(String, nullable=False)
+class ChatRecord(Base):
+    __tablename__ = "chat_records"
+    id = Column(Integer, primary_key=True, index=True)
+    session_id = Column(Integer, ForeignKey("user_sessions.id"))
+    raw_query = Column(String)
     clarified_query = Column(String)
     answer = Column(String)
-    confidence = Column(String)
-    timestamp = Column(DateTime, server_default=func.now())
-    session = relationship('UserSession', back_populates='queries')
+    confidence = Column(Float)
+    created_at = Column(DateTime, default=datetime.now(timezone.utc))
+    session = relationship('UserSession', back_populates='chats')
 
 
 class Document(Base):
