@@ -19,10 +19,11 @@ load_dotenv(dotenv_path=os.path.abspath(".env"))
 
 Backend:
 ```bash
-uvicorn app.main:app --reload
+uvicorn main:app --reload
 ```
 
 Frontend:
 ```bash
-streamlit run ui/streamlit_app.py
+cd ui
+streamlit run streamlit_app.py
 ```

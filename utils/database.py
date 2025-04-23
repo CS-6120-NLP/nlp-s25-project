@@ -1,8 +1,9 @@
+import os
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
-from api.db_models import Base, ChatHistory, QueryRecord
-from config.default_settings import DATABASE_URL
+from config import DATABASE_URL
+from models.entities import Base, ChatHistory, ChatRecord
 
 engine = create_engine(
     DATABASE_URL,
@@ -10,26 +11,11 @@ engine = create_engine(
 )
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
-
 def init_db():
     Base.metadata.create_all(bind=engine)
 
-
 def get_db_session():
     return SessionLocal()
-
-
-def save_query_record(session_id, raw_query, clarified_query, answer, confidence):
-    db = get_db_session()
-    query_record = QueryRecord(
-        session_id=session_id,
-        raw_query=raw_query,
-        clarified_query=clarified_query,
-        answer=answer,
-        confidence=confidence
-    )
-    db.add(query_record)
-    db.commit()
 
 
 def save_chat_message(session_id, role, content):
