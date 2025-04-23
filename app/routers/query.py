@@ -14,6 +14,7 @@ from api.db_models import QueryRecord, UserSession
 from config.default_settings import CHAT_HISTORY_WINDOW
 
 import openai
+import json
 
 
 router = APIRouter()
@@ -32,9 +33,9 @@ def query_endpoint(payload: QueryRequest):
 
     # Retrieve + filter
     store = get_chroma_store()
-    retriever = store.as_retriever(search_kwargs={"k": 5})
-    retriever = filter_by_persona(retriever, payload.persona)
-    docs = retriever.get_relevant_documents(clarified)
+    # retriever = store.as_retriever(search_kwargs={"k": 5})
+    # retriever = filter_by_persona(retriever, payload.persona)
+    # docs = retriever.get_relevant_documents(clarified)
 
     # Answer
     db = get_db_session()
@@ -52,7 +53,8 @@ def query_endpoint(payload: QueryRequest):
         answer=answer,
         confidence=confidence
     )
-    chat_hist_summary = get_chat_summary(db,session.id, record)
+
+    chat_hist_summary = get_chat_summary(db,payload.session_id, record.raw_query)
     db.add(record)
     db.commit()
 
@@ -64,18 +66,20 @@ def get_chat_history(db, session_id, limit=CHAT_HISTORY_WINDOW):
     """
     Retrieve the 40 latest chat history records from the database for a given session_id.
     """
-    return (db.query(QueryRecord)
-            .filter(QueryRecord.session_id == session_id)
-            .order_by(QueryRecord.timestamp.desc())
-            .limit(limit).all())
+    records = (db.query(QueryRecord).
+              filter(QueryRecord.session_id == session_id).
+              order_by(QueryRecord.timestamp.desc()).
+              limit(limit).all())
+    return [(r.raw_query, r.answer) for r in records]
+
 
 def get_chat_summary(db,session_id, latest_message):
     """
     New summary = old chat summary + latest chat message
+    latest_message : raw query from this asking
     """
 
     # get UserSession Info
-    db = get_db_session()
     session = db.query(UserSession).filter_by(session_id=session_id).first()
     if session is None :
         print("Did not find this user = ", {session_id})
@@ -85,9 +89,10 @@ def get_chat_summary(db,session_id, latest_message):
         Use the chat summary and latest message to generate new summary for the user. 
     """
 
-    # Todo !!! Change Open AI to the Gemini
-    new_summary = generate_chat_summary_with_openai(session.chat_summary, latest_message)
+    # Todo !!! Change Open AI to the Gemini(Free)
+    new_summary = generate_chat_summary_with_openai(session.chat_summary, json.dumps(latest_message,default= str))
 
+    # adding the new summary to the userSession
     session.chat_summary = new_summary
     db.commit()
     return new_summary
@@ -97,17 +102,18 @@ def generate_chat_summary_with_openai(chat_summary, latest_message):
     """
     Generate a new chat summary using OpenAI's API.
     """
-    prompt = f"""
-    Previous chat summary: {chat_summary}
-    Latest message: {latest_message}
-    Generate a new concise chat summary that incorporates the latest message into the previous summary.
-    """
+    messages = [
+        {"role": "system", "content": "You are a helpful assistant that summarizes chat history."},
+        {"role": "user", "content": f"Previous chat summary: {chat_summary}"},
+        {"role": "user", "content": f"Latest message: {latest_message}"},
+        {"role": "user", "content": "Generate a new concise chat summary that incorporates the latest message."}
+    ]
 
-    response = openai.Completion.create(
-        engine="text-davinci-003",  # You can use other models like "gpt-3.5-turbo"
-        prompt=prompt,
+    response = openai.ChatCompletion.create(
+        model="gpt-3.5-turbo",  # You can use other models like "gpt-3.5-turbo"
+        messages=messages,
         max_tokens=100,  # Adjust based on your needs
         temperature=0.5  # Adjust for creativity vs. consistency
     )
 
-    return response.choices[0].text.strip()
+    return response.choices[0].message["content"].strip()
