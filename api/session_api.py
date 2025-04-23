@@ -2,7 +2,7 @@ from fastapi import APIRouter
 
 from models.request_models import SessionRequest
 from models.response_models import SessionResponse
-from utils.auth_utils import get_or_create_session
+from utils.authentication import get_or_create_session
 
 router = APIRouter()
 

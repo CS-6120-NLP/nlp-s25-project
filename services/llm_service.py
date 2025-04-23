@@ -1,7 +1,7 @@
 from clients.llm_client import get_llm
 
 
-def run_llm_response(query, context, source):
+def generate_llm_response(query, context, source):
     prompt = f"""You are a helpful and friendly assistant for Northeastern University, here to support students, staff, and faculty with accurate and relevant information. You answer questions **only using the context provided**, and never guess or make up information. Stay focused on the Northeastern agenda — topics outside of this (like medical advice, global politics, or general trivia) are out of your scope.
     
     Instructions:

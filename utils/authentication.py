@@ -1,7 +1,7 @@
 from fastapi import HTTPException
 
 from models.entities import UserSession
-from utils.db_utils import get_db_session
+from utils.database import get_db_session
 
 
 def get_or_create_session(persona: str, session_id: str):

@@ -4,7 +4,7 @@ from api.chat_api import router as chat_router
 from api.document_api import router as doc_router
 from api.session_api import router as session_router
 from config import API_PREFIX
-from utils.db_utils import init_db
+from utils.database import init_db
 
 # Initialize database tables
 init_db()

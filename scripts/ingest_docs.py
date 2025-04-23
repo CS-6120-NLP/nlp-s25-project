@@ -6,7 +6,7 @@ from langchain_community.embeddings import OpenAIEmbeddings
 from langchain_community.vectorstores import Chroma
 
 from models.entities import Document as DocumentModel
-from utils.db_utils import get_db_session
+from utils.database import get_db_session
 
 
 def ingest(input_dir="docs", persist_dir="chroma_db"):

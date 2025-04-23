@@ -11,4 +11,5 @@ Backend:
 - `uvicorn main:app --reload`
 
 Frontend:
-- `streamlit run ui/streamlit_app.py`
+- `cd ui`
+- `streamlit run streamlit_app.py`
