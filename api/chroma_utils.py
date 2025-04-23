@@ -35,7 +35,7 @@ def retriever1_manual(query: str):
     )
 
     # print(results)
-    return results['documents']
+    return results['documents'][0], results['metadatas'][0]
 
 def retriever2_semantic(query: str):
     chroma_client = chromadb.PersistentClient(path="./chroma_db")
@@ -45,7 +45,7 @@ def retriever2_semantic(query: str):
         n_results=10
     )
     # print(results)
-    return results['documents']
+    return results['documents'][0], results['metadatas'][0]
 
 def retriever3_page_chunks(query: str):
     chroma_client = chromadb.PersistentClient(path="./chroma_db")
@@ -55,7 +55,7 @@ def retriever3_page_chunks(query: str):
         n_results=5
     )
     # print(results)
-    return results['documents']
+    return results['documents'][0], results['metadatas'][0]
 
 def retriever4_hyde(query: str):    
     chroma_client = chromadb.PersistentClient(path="./chroma_db")
@@ -84,26 +84,42 @@ def retriever4_hyde(query: str):
     hyde_doc = HydeRagSystem("google/flan-t5-base", query)
     collection3 = chroma_client.get_collection(name="page_chunks")
     retrieved_docs = collection3.query(query_texts=[hyde_doc], n_results=k)
-    return retrieved_docs['documents'], hyde_doc
+    return retrieved_docs['documents'][0], retrieved_docs['metadatas'][0], hyde_doc
 
 def hybrid_query_model(query):
-    retr1 = retriever1_manual(query)
-    retr2 = retriever2_semantic(query)
-    retr3 = retriever3_page_chunks(query)
-    retr4, hyde_doc = retriever4_hyde(query)
+    retr1, meta1 = retriever1_manual(query)
+    retr2, meta2 = retriever2_semantic(query)
+    retr3, meta3 = retriever3_page_chunks(query)
+    retr4, meta4, hyde_doc = retriever4_hyde(query)
+
+    combined_docs = retr1 + retr2 + retr3 + retr4
+    combined_meta = meta1 + meta2 + meta3 + meta4
+    doc_meta_pairs = list(zip(combined_docs, combined_meta))
+
+    seen = set()
+    unique_doc_meta_pairs = []
+    for doc, meta in doc_meta_pairs:
+        if doc not in seen:
+            unique_doc_meta_pairs.append((doc, meta))
+            seen.add(doc)
+
+    unique_docs = [doc for doc, _ in unique_doc_meta_pairs]
+
     #Re-ranker
-    
     cohere_api_key = os.getenv("COHERE_API_KEY")
     import cohere
     co = cohere.ClientV2(api_key=cohere_api_key)
-    overall_documents=retr1[0] + retr2[0] + retr3[0] + retr4[0]
-    overall_documents = list(set(overall_documents))
-    result = co.rerank(model='rerank-english-v2.0', query=query, documents=overall_documents, top_n=5)
-    reranked_docs = [overall_documents[ele.index] for ele in result.results]
-    return reranked_docs
+    result = co.rerank(model='rerank-english-v2.0', query=query, documents=unique_docs, top_n=5)
+    reranked = []
+    for res in result.results:
+        doc, meta = unique_doc_meta_pairs[res.index]
+        url = meta.get("url", "No URL") if meta else "No Metadata"
+        reranked.append((doc, url))
+    return reranked
 
 
 def final_retriever(query):
-    docs = hybrid_query_model(query)
-    context = "\n\n".join([doc for doc in docs if doc])
-    return context
+    docs_url = hybrid_query_model(query)
+    context = "\n\n".join([doc for doc, url in docs_url if doc])
+    source = [url for doc, url in docs_url]
+    return context, source

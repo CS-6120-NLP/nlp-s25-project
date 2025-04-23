@@ -20,7 +20,7 @@ import os
 from dotenv import load_dotenv
 load_dotenv()
 
-def run_llm_response(query, context):
+def run_llm_response(query, context, source):
     prompt = f"""You are a helpful and friendly assistant for Northeastern University, here to support students, staff, and faculty with accurate and relevant information. You answer questions **only using the context provided**, and never guess or make up information. Stay focused on the Northeastern agenda — topics outside of this (like medical advice, global politics, or general trivia) are out of your scope.
 
 Instructions:
@@ -32,6 +32,7 @@ Instructions:
 - If they ask for help, briefly explain what you can do (answer Northeastern-related queries based on the context).
 - If asked for a summary, provide a quick and accurate one.
 - Inject a light, positive tone — like a helpful campus buddy who knows their stuff (but not everything!).
+- Based on the {source}, always provide citations.
 
 Context:
 {context}
@@ -44,7 +45,7 @@ Answer:
 
     llm = ChatGoogleGenerativeAI(
         model="gemini-2.0-flash",
-        google_api_key=os.getenv("GOOGLE_API_KEY"),  # safer than hardcoding
+        google_api_key=os.getenv("GOOGLE_API_KEY"),
         temperature=1
     )
     

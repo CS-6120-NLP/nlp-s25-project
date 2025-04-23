@@ -29,7 +29,7 @@ def query_endpoint(payload: QueryRequest):
     # retriever = store.as_retriever(search_kwargs={"k": 5})
     # retriever = filter_by_persona(retriever, payload.persona)
     # docs = retriever.get_relevant_documents(clarified)
-    context = final_retriever(clarified)
+    context, source = final_retriever(clarified)
 
 
 
@@ -38,7 +38,7 @@ def query_endpoint(payload: QueryRequest):
     # result = chain({"question": clarified, "chat_history": []})
     # answer = result.get("answer", "")
     # confidence = float(result.get("score", 0.0))
-    result = run_llm_response(clarified, context)
+    result = run_llm_response(clarified, context, source)
     answer = result.content if isinstance(result.content, str) else str(result.content)
     confidence = 0.9
 
