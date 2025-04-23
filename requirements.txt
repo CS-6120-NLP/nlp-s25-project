@@ -17,3 +17,4 @@ pdfminer.six
 pi_heif
 unstructured_inference
 pdf2image
+tiktoken
