@@ -17,19 +17,6 @@ if st.sidebar.button("Start Session"):
     else:
         st.sidebar.error(res.text)
 
-# Document upload
-st.sidebar.header("Upload Document")
-uploaded_file = st.sidebar.file_uploader("Choose file", type=["pdf", "docx", "txt"])
-personas = st.sidebar.multiselect("Tag personas", ["student", "staff"], default=[persona])
-if uploaded_file and st.sidebar.button("Upload"):
-    files = {"file": (uploaded_file.name, uploaded_file.getvalue())}
-    data = [("personas", p) for p in personas]
-    res = requests.post(f"{API_URL}/document", files=files, data=data)
-    if res.ok:
-        st.sidebar.success("Uploaded!")
-    else:
-        st.sidebar.error(res.text)
-
 # Query
 st.header("Ask a Question")
 query = st.text_input("Your question here")

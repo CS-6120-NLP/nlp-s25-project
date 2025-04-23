@@ -9,7 +9,7 @@ router = APIRouter()
 
 
 @router.post("", response_model=ChatResponse)
-def query_endpoint(payload: ChatRequest):
+def initiate_chat(payload: ChatRequest):
     # Initialize session
     session = get_or_create_session(payload.persona, payload.session_id)
 
