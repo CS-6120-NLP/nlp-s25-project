@@ -19,9 +19,9 @@ services:
       - ./chroma_data:/chroma/chroma
     environment:
       - IS_PERSISTENT=TRUE
+      - PERSIST_DIRECTORY=/chroma/chroma
       - ALLOW_RESET=TRUE
       - ANONYMIZED_TELEMETRY=FALSE
-
   db:
     image: postgres:14
     environment:
