@@ -85,7 +85,7 @@ def process_chat(session_id, raw_query):
         answer=answer,
         confidence=confidence
     )
-    SessionRepository().save_summary(
+    SessionRepository().save_session_summary(
         session_id=session_id,
         summary=updated_summary
     )

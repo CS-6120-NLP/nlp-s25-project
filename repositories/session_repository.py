@@ -19,7 +19,7 @@ class SessionRepository:
             print("Chat summary not found for session:", session_id)
             return None
 
-    def save_summary(self, session_id, summary):
+    def save_session_summary(self, session_id, summary):
         """Save a chat summary to the database."""
         session = self.db.query(UserSession).filter_by(session_id=session_id).first()
         if not session:
