@@ -5,14 +5,14 @@ from fastapi import APIRouter
 from models.request_models import SessionRequest, SessionSummaryRequest
 from models.response_models import SessionResponse, SessionSummaryResponse
 from services.chat_service import get_session_summary as get_session_summary_service
-from services.session_service import get_session_history as get_session_history_service, get_session
+from services.session_service import get_session, get_session_history as get_session_history_service
 
 router = APIRouter()
 
 
 @router.post("", response_model=SessionResponse)
 def initiate_session(payload: SessionRequest):
-    session = get_session(payload.persona, payload.session_id)
+    session = get_session(payload.session_id, payload.persona)
     return SessionResponse(session_id=session.session_id, persona=session.persona)
 
 
