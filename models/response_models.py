@@ -11,6 +11,7 @@ class ChatResponse(BaseModel):
 
 class SessionResponse(BaseModel):
     session_id: str
+    persona: Literal["student", "staff"]
 
 
 class SummaryResponse(BaseModel):

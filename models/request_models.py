@@ -19,3 +19,4 @@ class SummaryRequest(BaseModel):
 
 class SessionRequest(BaseModel):
     session_id: str
+    persona: Literal["student", "staff"]
