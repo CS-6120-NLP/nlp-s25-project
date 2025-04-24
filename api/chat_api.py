@@ -5,19 +5,16 @@ from fastapi import APIRouter
 from models.request_models import ChatRequest, ChatHistoryRequest
 from models.response_models import ChatResponse
 from services.chat_service import process_chat, get_chat_history as get_chat_history_service
-from utils.authentication import get_or_create_session
 
 router = APIRouter()
 
 
 @router.post("", response_model=ChatResponse)
 def initiate_chat(payload: ChatRequest):
-    # Validate session. If it doesn't exist, create a new one.
-    session = get_or_create_session(payload.persona, payload.session_id)
-
     # Process the chat query
     answer, confidence = process_chat(
-        session_id=session.session_id,
+        session_id=payload.session_id,
+        persona=payload.persona,
         raw_query=payload.query
     )
 
