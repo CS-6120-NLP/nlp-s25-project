@@ -18,5 +18,4 @@ class ChatSummaryRequest(BaseModel):
 
 
 class SessionRequest(BaseModel):
-    persona: Literal["student", "staff"]
     session_id: str
