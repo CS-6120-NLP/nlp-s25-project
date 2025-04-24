@@ -44,7 +44,7 @@ st.sidebar.header("Chat Summary")
 res = requests.get(f"{API_URL}/chat/summary", json={"session_id": session_id})
 if res.ok:
     chat_summary = res.json()
-    st.sidebar.markdown("**Summary:** " + chat_summary.get("summary", "N/A"))
+    st.sidebar.markdown(chat_summary.get("summary", "N/A"))
 else:
     st.sidebar.text("(No summary available.)")
 
