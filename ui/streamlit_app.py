@@ -48,13 +48,7 @@ if res.ok:
 else:
     st.sidebar.text("(No summary available.)")
 
-# Query
-st.header("Ask a Question")
-question_input = st.text_input("Your question here:")
-send_button_event = st.button("Send")
-
 # Chat history
-st.header("Chat History")
 chat_history_panel = st.empty()
 
 res = requests.get(f"{API_URL}/chat/history", json={"session_id": session_id})
@@ -68,20 +62,30 @@ if res.ok:
 else:
     chat_history_panel.write("(No chat history available.)")
 
-if send_button_event:
-    if question_input.strip():
-        st.markdown("**You:** " + question_input)
+# Initialize session state for button
+if "button_disabled" not in st.session_state:
+    st.session_state["button_disabled"] = False
 
-        # Send message to API
-        payload = {
-            "query": question_input,
-            "persona": persona,
-            "session_id": session_id
-        }
-        res = requests.post(f"{API_URL}/chat", json=payload)
-        if res.ok:
-            data = res.json()
-            bot_response = data.get("answer", "No response")
-            st.markdown("**Assistant:** " + bot_response)
-        else:
-            st.error(res.text)
+
+# Generate response
+def generate_response(user_input):
+    st.session_state["button_disabled"] = True  # Disable button
+    st.markdown(f"**You:** {user_input}")
+    payload = {
+        "query": user_input,
+        "persona": persona,
+        "session_id": session_id
+    }
+    res = requests.post(f"{API_URL}/chat", json=payload)
+    if res.ok:
+        answer = res.json().get("answer", "No response")
+        st.markdown(f"**Assistant:** {answer}")
+    else:
+        st.error(res.text)
+    st.session_state["button_disabled"] = False  # Re-enable button
+
+
+# Query
+question_input = st.chat_input("Ask a Question", disabled=st.session_state["button_disabled"])
+if question_input:
+    generate_response(question_input)
