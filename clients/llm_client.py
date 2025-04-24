@@ -55,8 +55,7 @@ def generate_updated_summary(prev_summary, latest_chat_record):
     """
     Generate an updated summary based on the previous summary and the latest chat record.
     """
-    latest_chat_record_formatted = "- User: " + latest_chat_record["raw_query"] + "\n- AI: " + latest_chat_record[
-        "answer"]
+    latest_chat_record_formatted = "- User: " + latest_chat_record.raw_query + "\n- AI: " + latest_chat_record.answer
 
     prompt = f"""
     You are a helpful assistant responsible for summarizing user conversations.
