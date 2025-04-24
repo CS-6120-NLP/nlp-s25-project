@@ -23,21 +23,17 @@ Rewritten Query: What is the Masters in Computer Science about at Northeastern U
 User Query: When is the midterm?
 Rewritten Query: What are the midterm examinations at Northeastern University for the current semester?
 
-Chat History:
-{chat_history}
+Previous Chat Summary:
+{chat_summary}
 """
 prompt = PromptTemplate(template=template, input_variables=["query"])
 
 
-def clarify_query(query, chat_history):
+def clarify_query(query, chat_summary):
     """Clarify and rewrite the user query to be more precise."""
     llm = get_llm()
 
-    formatted_history = "\n".join(
-        f"User: {chat_record['raw_query']}, AI: {chat_record['answer']}" for chat_record in chat_history
-    )
-
-    input_text = prompt.format(query=query, chat_history=formatted_history)
+    input_text = prompt.format(query=query, chat_summary=chat_summary)
     return llm.invoke(input_text).content.strip()
 
 
@@ -54,24 +50,25 @@ def get_chat_summary(session_id):
 
 
 def process_chat(session_id, raw_query):
-    # Retrieve chat history
-    chat_history = [{"raw_query": chat_record.raw_query, "clarified_query": chat_record.clarified_query,
-                     "answer": chat_record.answer} for chat_record in get_chat_history(session_id)]
-
     prev_chat_summary = get_chat_summary(session_id)
     if prev_chat_summary is None:
         prev_chat_summary = ""
+
+        # Retrieve chat history
+        chat_history = [{"raw_query": chat_record.raw_query, "clarified_query": chat_record.clarified_query,
+                         "answer": chat_record.answer} for chat_record in get_chat_history(session_id)]
+
         for record in chat_history:
             prev_chat_summary += f"- User: {record['raw_query']}\n- AI: {record['answer']}\n"
 
     # Clarify query
-    clarified_query = clarify_query(raw_query, chat_history)
+    clarified_query = clarify_query(raw_query, prev_chat_summary)
 
     # Retrieve context
     context, source = retrieve_context(clarified_query)
 
     # Generate response
-    result = generate_llm_response(clarified_query, context, source, chat_history)
+    result = generate_llm_response(clarified_query, context, source, prev_chat_summary)
     answer = result.content if isinstance(result.content, str) else str(result.content)
     confidence_match = re.search(r"\[Confidence:\s*([0-9]*\.?[0-9]+)\]", result)
     confidence = float(confidence_match.group(1)) if confidence_match else None
