@@ -18,8 +18,6 @@ pdfminer.six
 pi_heif
 unstructured_inference
 pdf2image
-tiktoken
 cohere
 langchain_google_genai
 sentence_transformers
-git+https://github.com/brandonstarxel/chunking_evaluation.git

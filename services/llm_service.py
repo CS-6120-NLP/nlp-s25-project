@@ -4,7 +4,7 @@ from clients.llm_client import get_llm
 def generate_llm_response(query, context, source, chat_history):
     # Format the chat history for the prompt
     formatted_history = "\n".join(
-        f"{message['role'].capitalize()}: {message['content']}" for message in chat_history
+        f"User: {chat_record['raw_query']}, AI: {chat_record['answer']}" for chat_record in chat_history
     )
 
     # Create the prompt with the context and chat history

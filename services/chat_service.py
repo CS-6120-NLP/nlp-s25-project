@@ -31,7 +31,7 @@ def clarify_query(query, chat_history):
     llm = get_llm()
 
     formatted_history = "\n".join(
-        f"{message['role'].capitalize()}: {message['content']}" for message in chat_history
+        f"User: {chat_record['raw_query']}, AI: {chat_record['answer']}" for chat_record in chat_history
     )
 
     input_text = prompt.format(query=query, chat_history=formatted_history)
