@@ -8,7 +8,7 @@ from config import PERMISSION_THRESHOLD
 from repositories.chat_repository import ChatRepository
 from services import session_service
 from services.retrieval_service import retrieve_context
-from services.session_service import get_session_summary
+from services.session_service import get_session_summary, get_session
 
 template = """
 You are a query enrichment assistant working for Northeastern University. 
@@ -44,8 +44,11 @@ def get_chat_history(session_id):
     return repo.get_chat_history(session_id)
 
 
-def process_chat(session_id, raw_query):
-    chat_summary = get_session_summary(session_id)
+def process_chat(session_id, persona, raw_query):
+    # Validate session. If it doesn't exist, create a new one.
+    session = get_session(session_id, persona)
+
+    chat_summary = get_session_summary(session.id)
 
     # Clarify query
     clarified_query = clarify_query(raw_query, chat_summary)
@@ -67,7 +70,7 @@ def process_chat(session_id, raw_query):
     # Save record
     repo = ChatRepository()
     saved_chat_record = repo.save_chat_record(
-        session_id=session_id,
+        session_id=session.id,
         raw_query=raw_query,
         clarified_query=clarified_query,
         answer=answer,
@@ -75,6 +78,6 @@ def process_chat(session_id, raw_query):
     )
 
     # Update session summary
-    session_service.update_session_summary(session_id, chat_summary, saved_chat_record)
+    session_service.update_session_summary(session.id, chat_summary, saved_chat_record)
 
     return answer, confidence

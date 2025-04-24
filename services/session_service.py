@@ -1,6 +1,24 @@
 # services/session_service.py
+from fastapi import HTTPException
+
 from clients.llm_client import generate_updated_summary
+from models.entities import UserSession
 from repositories.session_repository import SessionRepository
+from utils.database import get_db_session
+
+
+def get_session(session_id: str, persona: str):
+    db = get_db_session()
+    session = db.query(UserSession).filter_by(session_id=session_id).first()
+    if session and session.persona != persona:
+        raise HTTPException(status_code=403, detail="Persona mismatch.")
+    if not session:
+        session = UserSession(session_id=session_id, persona=persona)
+        db.add(session)
+        db.commit()
+        db.refresh(session)
+    return session
+
 
 def get_session_history():
     """Retrieve all user sessions."""
