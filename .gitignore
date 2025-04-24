@@ -63,5 +63,7 @@ logs/
 .devcontainer/
 
 #DB
-.db/
-nu_chatbot.db
+*.db
+*.sqlite3
+chroma_db/
+*/chroma_db/
