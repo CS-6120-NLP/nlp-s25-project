@@ -9,7 +9,7 @@ from clients.llm_client import get_llm
 
 
 class Retriever:
-    def __init__(self, db_path="data/chroma_db"):
+    def __init__(self, db_path="data/db/vector/chroma"):
         self.chroma_client = chromadb.PersistentClient(path=db_path)
 
     def retrieve_from_manual_catalog(self, query, n_results=10):
