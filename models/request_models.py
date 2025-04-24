@@ -13,7 +13,7 @@ class ChatHistoryRequest(BaseModel):
     session_id: str
 
 
-class ChatSummaryRequest(BaseModel):
+class SummaryRequest(BaseModel):
     session_id: str
 
 

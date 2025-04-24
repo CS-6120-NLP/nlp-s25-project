@@ -2,9 +2,9 @@ from typing import List
 
 from fastapi import APIRouter
 
-from models.request_models import ChatRequest, ChatHistoryRequest, ChatSummaryRequest
-from models.response_models import ChatResponse, ChatSummaryResponse
-from services.chat_service import process_chat, get_chat_history as get_chat_history_service, get_chat_summary as get_chat_summary_service
+from models.request_models import ChatRequest, ChatHistoryRequest
+from models.response_models import ChatResponse
+from services.chat_service import process_chat, get_chat_history as get_chat_history_service
 from utils.authentication import get_or_create_session
 
 router = APIRouter()
@@ -28,9 +28,3 @@ def initiate_chat(payload: ChatRequest):
 def get_chat_history(payload: ChatHistoryRequest):
     chat_history = get_chat_history_service(payload.session_id)
     return [ChatResponse(raw_query=record.raw_query, answer=record.answer, confidence=record.confidence) for record in chat_history]
-
-
-@router.get("/summary", response_model=ChatSummaryResponse)
-def get_chat_summary(payload: ChatSummaryRequest):
-    chat_summary = get_chat_summary_service(payload.session_id)
-    return ChatSummaryResponse(summary=chat_summary)

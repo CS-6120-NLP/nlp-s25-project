@@ -6,8 +6,10 @@ from langchain.prompts import PromptTemplate
 from clients.llm_client import get_llm
 from config import PERMISSION_THRESHOLD
 from repositories.chat_repository import ChatRepository
+from repositories.session_repository import SessionRepository
 from services.llm_service import generate_llm_response, generate_updated_summary
 from services.retrieval_service import retrieve_context
+from services.session_service import get_summary
 
 template = """
 You are a query enrichment assistant working for Northeastern University. 
@@ -43,32 +45,26 @@ def get_chat_history(session_id):
     return repo.get_chat_history(session_id)
 
 
-def get_chat_summary(session_id):
-    """Retrieve chat summary from the database."""
-    repo = ChatRepository()
-    return repo.get_chat_summary(session_id)
-
-
 def process_chat(session_id, raw_query):
-    prev_chat_summary = get_chat_summary(session_id)
-    if prev_chat_summary is None:
-        prev_chat_summary = ""
+    prev_summary = get_summary(session_id)
+    if prev_summary is None:
+        prev_summary = ""
 
         # Retrieve chat history
         chat_history = [{"raw_query": chat_record.raw_query, "clarified_query": chat_record.clarified_query,
                          "answer": chat_record.answer} for chat_record in get_chat_history(session_id)]
 
         for record in chat_history:
-            prev_chat_summary += f"- User: {record['raw_query']}\n- AI: {record['answer']}\n"
+            prev_summary += f"- User: {record['raw_query']}\n- AI: {record['answer']}\n"
 
     # Clarify query
-    clarified_query = clarify_query(raw_query, prev_chat_summary)
+    clarified_query = clarify_query(raw_query, prev_summary)
 
     # Retrieve context
     context, source = retrieve_context(clarified_query)
 
     # Generate response
-    result = generate_llm_response(clarified_query, context, source, prev_chat_summary)
+    result = generate_llm_response(clarified_query, context, source, prev_summary)
     answer = result.content if isinstance(result.content, str) else str(result.content)
     confidence_match = re.search(r"\[Confidence:\s*([0-9]*\.?[0-9]+)]", answer)
     confidence = float(confidence_match.group(1)) if confidence_match else None
@@ -79,20 +75,19 @@ def process_chat(session_id, raw_query):
         confidence = 0.0
 
     # Update chat summary
-    updated_summary = generate_updated_summary(prev_chat_summary, {"raw_query": raw_query, "answer": answer})
+    updated_summary = generate_updated_summary(prev_summary, {"raw_query": raw_query, "answer": answer})
 
     # Save record
-    repo = ChatRepository()
-    repo.save_chat_record(
+    ChatRepository().save_chat_record(
         session_id=session_id,
         raw_query=raw_query,
         clarified_query=clarified_query,
         answer=answer,
         confidence=confidence
     )
-    repo.save_chat_summary(
+    SessionRepository().save_summary(
         session_id=session_id,
-        chat_summary=updated_summary
+        summary=updated_summary
     )
 
     return answer, confidence

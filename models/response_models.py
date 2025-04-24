@@ -14,5 +14,5 @@ class SessionResponse(BaseModel):
     persona: Literal["student", "staff"]
 
 
-class ChatSummaryResponse(BaseModel):
+class SummaryResponse(BaseModel):
     summary: str

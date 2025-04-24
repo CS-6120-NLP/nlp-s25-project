@@ -13,7 +13,7 @@ class UserSession(Base):
     id = Column(Integer, primary_key=True)
     session_id = Column(String, unique=True, nullable=False)
     persona = Column(String, nullable=False)
-    chat_summary = Column(String, nullable=True)
+    summary = Column(String, nullable=True)
     created_at = Column(DateTime, server_default=func.now())
     chats = relationship('ChatRecord', back_populates='session')
 
