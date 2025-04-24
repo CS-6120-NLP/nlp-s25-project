@@ -1,16 +1,27 @@
 from typing import Set
 
 import chromadb
+from chromadb.config import Settings
 from langchain.prompts import PromptTemplate
 from langchain_core.output_parsers import StrOutputParser
 
 from clients.cohere_client import rerank_documents
 from clients.llm_client import get_llm
+from config import CHROMA_SERVER_HOST, CHROMA_SERVER_PORT
 
 
 class Retriever:
     def __init__(self, db_path="data/db/vector/chroma"):
-        self.chroma_client = chromadb.PersistentClient(path=db_path)
+        # If host and port are specified and not empty, use client mode (deployed)
+        if CHROMA_SERVER_HOST and CHROMA_SERVER_PORT and CHROMA_SERVER_HOST.strip() and CHROMA_SERVER_PORT.strip():
+            self.chroma_client = chromadb.HttpClient(
+                host=CHROMA_SERVER_HOST,
+                port=int(CHROMA_SERVER_PORT),
+                ssl=True
+            )
+        # Otherwise use embedded mode (local development)
+        else:
+            self.chroma_client = chromadb.PersistentClient(path=db_path)
 
     def retrieve_from_manual_catalog(self, query, n_results=10):
         collection = self.chroma_client.get_collection(name="manual_catalog")

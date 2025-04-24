@@ -8,19 +8,3 @@ services:
       - '8000:8000'
     volumes:
       - .:/app
-    depends_on:
-      - chroma
-      - db
-  chroma:
-    image: ghcr.io/chroma-core/chroma:latest
-    ports:
-      - '8000:8000'
-    # Use default settings
-  db:
-    image: postgres:14
-    environment:
-      POSTGRES_DB: nu_chatbot
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: password
-    ports:
-      - '5432:5432'
