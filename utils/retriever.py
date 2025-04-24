@@ -12,17 +12,13 @@ from config import CHROMA_SERVER_HOST, CHROMA_SERVER_PORT
 
 class Retriever:
     def __init__(self, db_path="data/db/vector/chroma"):
-        # Check if environment variables for Chroma server are set
-        chroma_server_host = CHROMA_SERVER_HOST
-        chroma_server_port = CHROMA_SERVER_PORT
-
         # If host and port are specified and not empty, use client mode (deployed)
-        if chroma_server_host and chroma_server_port and chroma_server_host.strip() and chroma_server_port.strip():
-            self.chroma_client = chromadb.Client(Settings(
-                chroma_server_host=chroma_server_host,
-                chroma_server_http_port=int(chroma_server_port),
-                chroma_server_ssl_enabled=True
-            ))
+        if CHROMA_SERVER_HOST and CHROMA_SERVER_PORT and CHROMA_SERVER_HOST.strip() and CHROMA_SERVER_PORT.strip():
+            self.chroma_client = chromadb.HttpClient(
+                host=CHROMA_SERVER_HOST,
+                port=int(CHROMA_SERVER_PORT),
+                ssl=True
+            )
         # Otherwise use embedded mode (local development)
         else:
             self.chroma_client = chromadb.PersistentClient(path=db_path)
