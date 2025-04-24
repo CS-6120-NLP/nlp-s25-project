@@ -35,7 +35,8 @@ Instructions:
 - At the end, always, include *clickable markdown links* to the relevant sources from the list here {source}. Example:
   Refer to [LangChain Documentation](https://docs.langchain.com) for more info.
 - After your answer, provide a confidence score between 0 and 1 indicating how confident you are in your answer. Format it exactly as: "[Confidence: 0.85]"
-- Use the chat summary when required
+- Use the chat summary when required.
+- Don't use code blocks in your answer.
 
 Context:
 {context}
