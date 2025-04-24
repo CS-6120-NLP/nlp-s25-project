@@ -48,7 +48,7 @@ def process_chat(session_id, persona, raw_query):
     # Validate session. If it doesn't exist, create a new one.
     session = get_session(session_id, persona)
 
-    chat_summary = get_session_summary(session.id)
+    chat_summary = get_session_summary(session.session_id)
 
     # Clarify query
     clarified_query = clarify_query(raw_query, chat_summary)
