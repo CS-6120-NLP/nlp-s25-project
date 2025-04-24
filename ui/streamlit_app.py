@@ -1,8 +1,8 @@
 import requests
 import streamlit as st
 
-BACKEND_URL = st.secrets.get("BACKEND_URL", "http://localhost:8000")
-API_URL = BACKEND_URL + st.secrets.get("API_PREFIX", "/api/v1")
+BACKEND_URL = st.secrets.get("BACKEND_URL", "")
+API_URL = BACKEND_URL + st.secrets.get("API_PREFIX", "")
 
 st.title("Northeastern University (NU) Chatbot")
 
