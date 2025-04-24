@@ -4,6 +4,7 @@ from pydantic import BaseModel
 
 
 class ChatResponse(BaseModel):
+    raw_query: str
     answer: str
     confidence: float
 

@@ -47,24 +47,21 @@ send_button_event = st.button("Send")
 st.header("Chat History")
 chat_history_panel = st.empty()
 
-def load_chat_history():
-    res = requests.get(f"{API_URL}/chat/history", json={"session_id": session_id})
-    if res.ok:
-        chat_history = res.json()
-        st.write(chat_history)
-        chat_history_content = ""
-        for record in chat_history:
-            chat_history_content += "**You:** " + record.get("raw_query", "") + "\n\n"
-            chat_history_content += "**Assistant:** " + record.get("answer", "") + " [Confidence: {}]".format(record.get("confidence", "N/A"))
-        chat_history_panel.markdown(chat_history_content)
-    else:
-        # chat_history_panel.write("(No chat history available.)")
-        chat_history_panel.write(res.text)
-
-load_chat_history()
+res = requests.get(f"{API_URL}/chat/history", json={"session_id": session_id})
+if res.ok:
+    chat_history = res.json()
+    chat_history_content = ""
+    for record in chat_history:
+        chat_history_content += "**You:** " + record.get("raw_query", "") + "\n\n"
+        chat_history_content += "**Assistant:** " + record.get("answer", "") + " [Confidence: {}]".format(record.get("confidence", "N/A")) + "\n\n"
+    chat_history_panel.markdown(chat_history_content)
+else:
+    chat_history_panel.write("(No chat history available.)")
 
 if send_button_event:
     if question_input.strip():
+        st.markdown("**You:** " + question_input)
+
         # Send message to API
         payload = {
             "query": question_input,
@@ -75,8 +72,6 @@ if send_button_event:
         if res.ok:
             data = res.json()
             bot_response = data.get("answer", "No response")
-            load_chat_history()
-            st.write(question_input)
-            st.write(bot_response)
+            st.markdown("**Assistant:** " + bot_response)
         else:
             st.error(res.text)
