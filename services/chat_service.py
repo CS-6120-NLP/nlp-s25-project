@@ -3,11 +3,10 @@ import re
 from langchain.chains import LLMChain
 from langchain.prompts import PromptTemplate
 
-from clients.llm_client import get_llm
+from clients.llm_client import get_llm, generate_chat_response
 from config import PERMISSION_THRESHOLD
 from repositories.chat_repository import ChatRepository
-from repositories.session_repository import SessionRepository
-from services.llm_service import generate_llm_response, generate_updated_summary
+from services import session_service
 from services.retrieval_service import retrieve_context
 from services.session_service import get_session_summary
 
@@ -46,25 +45,16 @@ def get_chat_history(session_id):
 
 
 def process_chat(session_id, raw_query):
-    prev_summary = get_session_summary(session_id)
-    if prev_summary is None:
-        prev_summary = ""
-
-        # Retrieve chat history
-        chat_history = [{"raw_query": chat_record.raw_query, "clarified_query": chat_record.clarified_query,
-                         "answer": chat_record.answer} for chat_record in get_chat_history(session_id)]
-
-        for record in chat_history:
-            prev_summary += f"- User: {record['raw_query']}\n- AI: {record['answer']}\n"
+    chat_summary = get_session_summary(session_id)
 
     # Clarify query
-    clarified_query = clarify_query(raw_query, prev_summary)
+    clarified_query = clarify_query(raw_query, chat_summary)
 
     # Retrieve context
     context, source = retrieve_context(clarified_query)
 
     # Generate response
-    result = generate_llm_response(clarified_query, context, source, prev_summary)
+    result = generate_chat_response(clarified_query, context, source, chat_summary)
     answer = result.content if isinstance(result.content, str) else str(result.content)
     confidence_match = re.search(r"\[Confidence:\s*([0-9]*\.?[0-9]+)]", answer)
     confidence = float(confidence_match.group(1)) if confidence_match else None
@@ -74,20 +64,17 @@ def process_chat(session_id, raw_query):
         answer = "I'm not sure about that. Can you please rephrase your question or provide more details?"
         confidence = 0.0
 
-    # Update chat summary
-    updated_summary = generate_updated_summary(prev_summary, {"raw_query": raw_query, "answer": answer})
-
     # Save record
-    ChatRepository().save_chat_record(
+    repo = ChatRepository()
+    saved_chat_record = repo.save_chat_record(
         session_id=session_id,
         raw_query=raw_query,
         clarified_query=clarified_query,
         answer=answer,
         confidence=confidence
     )
-    SessionRepository().save_session_summary(
-        session_id=session_id,
-        summary=updated_summary
-    )
+
+    # Update session summary
+    session_service.update_session_summary(session_id, chat_summary, saved_chat_record)
 
     return answer, confidence

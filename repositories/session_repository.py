@@ -33,3 +33,9 @@ class SessionRepository:
     def get_session_history(self):
         """Retrieve all user sessions."""
         return self.db.query(UserSession).order_by(UserSession.created_at.desc()).all()
+
+    def update_session_summary(self, session_id, updated_summary):
+        self.save_session_summary(
+            session_id=session_id,
+            summary=updated_summary
+        )
