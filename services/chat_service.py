@@ -64,8 +64,7 @@ def process_chat(session_id, raw_query):
     context, source = retrieve_context(clarified_query)
 
     # Generate response
-    result = generate_llm_response(clarified_query, context, source, prev_summary)
-    answer = result.content if isinstance(result.content, str) else str(result.content)
+    answer = generate_llm_response(clarified_query, context, source, prev_summary)
     confidence_match = re.search(r"\[Confidence:\s*([0-9]*\.?[0-9]+)]", answer)
     confidence = float(confidence_match.group(1)) if confidence_match else None
 
