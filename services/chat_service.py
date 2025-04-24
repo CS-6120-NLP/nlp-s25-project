@@ -70,7 +70,7 @@ def process_chat(session_id, persona, raw_query):
     # Save record
     repo = ChatRepository()
     saved_chat_record = repo.save_chat_record(
-        session_id=session.id,
+        session_id=session.session_id,
         raw_query=raw_query,
         clarified_query=clarified_query,
         answer=answer,
@@ -78,6 +78,6 @@ def process_chat(session_id, persona, raw_query):
     )
 
     # Update session summary
-    session_service.update_session_summary(session.id, chat_summary, saved_chat_record)
+    session_service.update_session_summary(session.session_id, chat_summary, saved_chat_record)
 
     return answer, confidence
