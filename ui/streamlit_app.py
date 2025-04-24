@@ -17,38 +17,55 @@ if st.sidebar.button("Start Session"):
     else:
         st.sidebar.error(res.text)
 
+# Past Sessions
+st.sidebar.header("Past Sessions")
+res = requests.get(f"{API_URL}/history/sessions")
+if res.ok:
+    session_history = res.json()
+    session_list = []
+    for session in session_history:
+        session_list.append(session["session_id"] + " (" + session["persona"] + ")")
+
+    selection = st.sidebar.pills(session_list, label="Select a past session:")
+    if selection:
+        selected_session = selection.split(" (")[0]
+        res = requests.post(f"{API_URL}/session", json={"persona": persona, "session_id": selected_session})
+        if res.ok:
+            st.sidebar.success("Session loaded!")
+            session_id = selected_session
+        else:
+            st.sidebar.error(res.text)
+else:
+    st.sidebar.text("(No past sessions available.)")
+
 # Query
 st.header("Ask a Question")
-query = st.text_input("Your question here:")
-response = st.button("Send")
+question_input = st.text_input("Your question here:")
+send_button_event = st.button("Send")
 
 # Chat history
 st.header("Chat History")
-if "chat_history" not in st.session_state:
-    st.session_state["chat_history"] = []
+chat_history_panel = st.empty()
 
-placeholder = st.empty()
-if st.session_state["chat_history"]:
-    for message in st.session_state["chat_history"]:
-        if message["role"] == "user":
-            st.markdown(f"**You:** {message['content']}")
-        else:
-            st.markdown(f"**Assistant:** {message['content']}")
-else:
-    placeholder.text("(No chat history yet.)")
+def load_chat_history():
+    res = requests.get(f"{API_URL}/history/chat", json={"session_id": session_id})
+    if res.ok:
+        chat_history = res.json()
+        chat_history_content = ""
+        for record in chat_history:
+            chat_history_content += "**You:** " + record.get("raw_query", "") + "\n"
+            chat_history_content += "**Assistant:** " + record.get("answer", "") + " [Confidence: {}]".format(record.get("confidence", "N/A")) + "\n"
+        chat_history_panel.markdown(chat_history_content)
+    else:
+        chat_history_panel.write("(No chat history available.)")
 
-if response:
-    if query.strip():
-        # Clear the placeholder
-        placeholder.empty()
+load_chat_history()
 
-        # Add user message to chat history
-        st.session_state["chat_history"].append({"role": "user", "content": query})
-        st.write("**You:**", query)
-
+if send_button_event:
+    if question_input.strip():
         # Send message to API
         payload = {
-            "query": query,
+            "query": question_input,
             "persona": persona,
             "session_id": session_id
         }
@@ -56,7 +73,6 @@ if response:
         if res.ok:
             data = res.json()
             bot_response = data.get("answer", "No response")
-            st.session_state["chat_history"].append({"role": "assistant", "content": bot_response})
-            st.markdown(f"**Assistant:** {bot_response} [Confidence: {data.get('confidence', 'N/A')}]")
+            load_chat_history()
         else:
             st.error(res.text)

@@ -1,4 +1,4 @@
-from models.entities import ChatRecord
+from models.entities import ChatRecord, UserSession
 from utils.database import get_db_session
 
 
@@ -25,3 +25,7 @@ class ChatRepository:
         self.db.commit()
         self.db.refresh(record)
         return record
+
+    def get_session_history(self):
+        """Retrieve all user sessions."""
+        return self.db.query(UserSession).all()
