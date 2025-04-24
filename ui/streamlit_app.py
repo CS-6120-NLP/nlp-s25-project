@@ -62,8 +62,13 @@ if res.ok:
 else:
     chat_history_panel.write("(No chat history available.)")
 
+# Initialize session state for button
+if "button_disabled" not in st.session_state:
+    st.session_state["button_disabled"] = False
+
 # Generate response
 def generate_response(user_input):
+    st.session_state["button_disabled"] = True  # Disable button
     st.markdown(f"**You:** {user_input}")
     payload = {
         "query": user_input,
@@ -76,8 +81,9 @@ def generate_response(user_input):
         st.markdown(f"**Assistant:** {answer}")
     else:
         st.error(res.text)
+    st.session_state["button_disabled"] = False  # Re-enable button
 
 # Query
-question_input = st.chat_input("Ask a Question")
+question_input = st.chat_input("Ask a Question", disabled=st.session_state["button_disabled"])
 if question_input:
     generate_response(question_input)
