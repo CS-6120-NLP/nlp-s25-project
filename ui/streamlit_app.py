@@ -28,6 +28,7 @@ if res.ok:
 
     selection = st.sidebar.pills("Select a past session:", session_list)
     if selection:
+        print(selection)
         selected_session = selection.split(" (")[0]
         res = requests.post(f"{API_URL}/session", json={"persona": persona, "session_id": selected_session})
         if res.ok:
@@ -37,6 +38,15 @@ if res.ok:
             st.sidebar.error(res.text)
 else:
     st.sidebar.text("(No past sessions available.)")
+
+# Chat summary
+st.sidebar.header("Chat Summary")
+res = requests.get(f"{API_URL}/chat/summary", json={"session_id": session_id})
+if res.ok:
+    chat_summary = res.json()
+    st.sidebar.markdown("**Summary:** " + chat_summary.get("summary", "N/A"))
+else:
+    st.sidebar.text("(No summary available.)")
 
 # Query
 st.header("Ask a Question")

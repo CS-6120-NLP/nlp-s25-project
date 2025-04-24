@@ -14,6 +14,7 @@ class UserSession(Base):
     session_id = Column(String, unique=True, nullable=False)
     persona = Column(String, nullable=False)
     created_at = Column(DateTime, server_default=func.now())
+    chat_summary = Column(String, nullable=True)
     chats = relationship('ChatRecord', back_populates='session')
 
 

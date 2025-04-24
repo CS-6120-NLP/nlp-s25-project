@@ -6,7 +6,7 @@ from langchain.prompts import PromptTemplate
 from clients.llm_client import get_llm
 from config import PERMISSION_THRESHOLD
 from repositories.chat_repository import ChatRepository
-from services.llm_service import generate_llm_response
+from services.llm_service import generate_llm_response, generate_updated_summary
 from services.retrieval_service import retrieve_context
 
 template = """
@@ -47,10 +47,22 @@ def get_chat_history(session_id):
     return repo.get_chat_history(session_id)
 
 
+def get_chat_summary(session_id):
+    """Retrieve chat summary from the database."""
+    repo = ChatRepository()
+    return repo.get_chat_summary(session_id)
+
+
 def process_chat(session_id, raw_query):
     # Retrieve chat history
     chat_history = [{"raw_query": chat_record.raw_query, "clarified_query": chat_record.clarified_query,
                      "answer": chat_record.answer} for chat_record in get_chat_history(session_id)]
+
+    prev_chat_summary = get_chat_summary(session_id)
+    if prev_chat_summary is None:
+        prev_chat_summary = ""
+        for record in chat_history:
+            prev_chat_summary += f"- User: {record['raw_query']}\n- AI: {record['answer']}\n"
 
     # Clarify query
     clarified_query = clarify_query(raw_query, chat_history)
@@ -69,6 +81,9 @@ def process_chat(session_id, raw_query):
         answer = "I'm not sure about that. Can you please rephrase your question or provide more details?"
         confidence = 0.0
 
+    # Update chat summary
+    updated_summary = generate_updated_summary(prev_chat_summary, {"raw_query": raw_query, "answer": answer})
+
     # Save record
     repo = ChatRepository()
     repo.save_chat_record(
@@ -77,6 +92,10 @@ def process_chat(session_id, raw_query):
         clarified_query=clarified_query,
         answer=answer,
         confidence=confidence
+    )
+    repo.save_chat_summary(
+        session_id=session_id,
+        chat_summary=updated_summary
     )
 
     return answer, confidence

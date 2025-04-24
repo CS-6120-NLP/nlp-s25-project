@@ -37,3 +37,25 @@ def generate_llm_response(query, context, source, chat_history):
     llm = get_llm()
 
     return llm.invoke(prompt)
+
+
+def generate_updated_summary(prev_summary, latest_chat_record):
+    """
+    Generate an updated summary based on the previous summary and the latest chat record.
+    """
+    latest_chat_record_formatted = "- User: " + latest_chat_record["raw_query"] + "\n- AI: " + latest_chat_record["answer"]
+
+    prompt = f"""
+    You are a helpful assistant responsible for summarizing user conversations.
+
+    Here is the previous chat summary:
+    {prev_summary}
+
+    Here is the latest user message:
+    {latest_chat_record_formatted}
+
+    Generate a new concise and coherent summary that incorporates the latest message into the previous summary.
+    """
+
+    llm = get_llm()
+    return llm.invoke(prompt).content.strip()
