@@ -19,26 +19,44 @@ Rewritten Query: What is the Masters in Computer Science about at Northeastern U
 
 User Query: When is the midterm?
 Rewritten Query: What are the midterm examinations at Northeastern University for the current semester?
+
+Chat History:
+{chat_history}
 """
 prompt = PromptTemplate(template=template, input_variables=["query"])
 
 
-def clarify_query(query):
+def clarify_query(query, chat_history):
     """Clarify and rewrite the user query to be more precise."""
     llm = get_llm()
-    chain = prompt | llm
-    return chain.invoke({"query": query}).content.strip()
+
+    formatted_history = "\n".join(
+        f"User: {chat_record['raw_query']}, AI: {chat_record['answer']}" for chat_record in chat_history
+    )
+
+    input_text = prompt.format(query=query, chat_history=formatted_history)
+    return llm.invoke(input_text).content.strip()
+
+
+def get_chat_history(session_id):
+    """Retrieve chat history from the database."""
+    repo = ChatRepository()
+    return repo.get_chat_history(session_id)
 
 
 def process_chat(session_id, raw_query):
+    # Retrieve chat history
+    chat_history = [{"raw_query": chat_record.raw_query, "clarified_query": chat_record.clarified_query,
+                     "answer": chat_record.answer} for chat_record in get_chat_history(session_id)]
+
     # Clarify query
-    clarified_query = clarify_query(raw_query)
+    clarified_query = clarify_query(raw_query, chat_history)
 
     # Retrieve context
     context, source = retrieve_context(clarified_query)
 
     # Generate response
-    result = generate_llm_response(clarified_query, context, source)
+    result = generate_llm_response(clarified_query, context, source, chat_history)
     answer = result.content if isinstance(result.content, str) else str(result.content)
     confidence = 0.9
 

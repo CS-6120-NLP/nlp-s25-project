@@ -1,7 +1,13 @@
 from clients.llm_client import get_llm
 
 
-def generate_llm_response(query, context, source):
+def generate_llm_response(query, context, source, chat_history):
+    # Format the chat history for the prompt
+    formatted_history = "\n".join(
+        f"User: {chat_record['raw_query']}, AI: {chat_record['answer']}" for chat_record in chat_history
+    )
+
+    # Create the prompt with the context and chat history
     prompt = f"""You are a helpful and friendly assistant for Northeastern University, here to support students, staff, and faculty with accurate and relevant information. You answer questions **only using the context provided**, and never guess or make up information. Stay focused on the Northeastern agenda — topics outside of this (like medical advice, global politics, or general trivia) are out of your scope.
     
     Instructions:
@@ -14,6 +20,9 @@ def generate_llm_response(query, context, source):
     - If asked for a summary, provide a quick and accurate one.
     - Inject a light, positive tone — like a helpful campus buddy who knows their stuff (but not everything!).
     - Based on the {source}, always provide citations.
+
+    Chat History:
+    {formatted_history}
     
     Context:
     {context}

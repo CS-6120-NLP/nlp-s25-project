@@ -21,4 +21,3 @@ pdf2image
 cohere
 langchain_google_genai
 sentence_transformers
-git+https://github.com/brandonstarxel/chunking_evaluation.git

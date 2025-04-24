@@ -12,7 +12,7 @@ services:
       - chroma
       - db
   chroma:
-    image: ghcr.io/chromadb/chromadb:latest
+    image: ghcr.io/chroma-core/chroma:latest
     ports:
       - '8000:8000'
     # Use default settings

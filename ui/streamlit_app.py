@@ -19,14 +19,44 @@ if st.sidebar.button("Start Session"):
 
 # Query
 st.header("Ask a Question")
-query = st.text_input("Your question here")
-if st.button("Send"):
-    payload = {"query": query, "persona": persona, "session_id": session_id}
-    res = requests.post(f"{API_URL}/chat", json=payload)
-    if res.ok:
-        data = res.json()
-        st.subheader("Answer")
-        st.write(data["answer"])
-        st.write(f"Confidence: {data['confidence']:.2f}")
-    else:
-        st.error(res.text)
+query = st.text_input("Your question here:")
+response = st.button("Send")
+
+# Chat history
+st.header("Chat History")
+if "chat_history" not in st.session_state:
+    st.session_state["chat_history"] = []
+
+placeholder = st.empty()
+if st.session_state["chat_history"]:
+    for message in st.session_state["chat_history"]:
+        if message["role"] == "user":
+            st.markdown(f"**You:** {message['content']}")
+        else:
+            st.markdown(f"**Assistant:** {message['content']}")
+else:
+    placeholder.text("(No chat history yet.)")
+
+if response:
+    if query.strip():
+        # Clear the placeholder
+        placeholder.empty()
+
+        # Add user message to chat history
+        st.session_state["chat_history"].append({"role": "user", "content": query})
+        st.write("**You:**", query)
+
+        # Send message to API
+        payload = {
+            "query": query,
+            "persona": persona,
+            "session_id": session_id
+        }
+        res = requests.post(f"{API_URL}/chat", json=payload)
+        if res.ok:
+            data = res.json()
+            bot_response = data.get("answer", "No response")
+            st.session_state["chat_history"].append({"role": "assistant", "content": bot_response})
+            st.markdown(f"**Assistant:** {bot_response} [Confidence: {data.get('confidence', 'N/A')}]")
+        else:
+            st.error(res.text)
