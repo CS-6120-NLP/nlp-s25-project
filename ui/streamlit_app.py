@@ -48,11 +48,6 @@ if res.ok:
 else:
     st.sidebar.text("(No summary available.)")
 
-# Query
-st.header("Ask a Question")
-question_input = st.text_input("Your question here:")
-send_button_event = st.button("Send")
-
 # Chat history
 chat_history_panel = st.empty()
 
