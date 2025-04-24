@@ -63,7 +63,7 @@ if res.ok:
     chat_history_content = ""
     for record in chat_history:
         chat_history_content += "**You:** " + record.get("raw_query", "") + "\n\n"
-        chat_history_content += "**Assistant:** " + record.get("answer", "") + " [Confidence: {}]".format(record.get("confidence", "N/A")) + "\n\n"
+        chat_history_content += "**Assistant:** " + record.get("answer", "") + "\n\n"
     chat_history_panel.markdown(chat_history_content)
 else:
     chat_history_panel.write("(No chat history available.)")
