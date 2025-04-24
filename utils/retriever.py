@@ -1,7 +1,6 @@
 from typing import Set
 
 import chromadb
-from chromadb.config import Settings
 from langchain.prompts import PromptTemplate
 from langchain_core.output_parsers import StrOutputParser
 

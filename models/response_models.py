@@ -4,6 +4,7 @@ from pydantic import BaseModel
 
 
 class ChatResponse(BaseModel):
+    raw_query: str
     answer: str
     confidence: float
 
@@ -11,3 +12,7 @@ class ChatResponse(BaseModel):
 class SessionResponse(BaseModel):
     session_id: str
     persona: Literal["student", "staff"]
+
+
+class SessionSummaryResponse(BaseModel):
+    summary: str

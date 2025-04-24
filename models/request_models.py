@@ -9,11 +9,14 @@ class ChatRequest(BaseModel):
     session_id: str
 
 
-class SessionRequest(BaseModel):
-    persona: Literal["student", "staff"]
+class ChatHistoryRequest(BaseModel):
     session_id: str
 
 
-class ChatHistoryRequest(BaseModel):
+class SessionSummaryRequest(BaseModel):
+    session_id: str
+
+
+class SessionRequest(BaseModel):
     session_id: str
     persona: Literal["student", "staff"]

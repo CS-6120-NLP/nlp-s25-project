@@ -10,7 +10,7 @@ class ChatRepository:
 
     def get_chat_history(self, session_id):
         """Retrieve chat records for a given session ID."""
-        return self.db.query(ChatRecord).filter(ChatRecord.session_id == session_id).all()
+        return self.db.query(ChatRecord).filter(ChatRecord.session_id == session_id).order_by(ChatRecord.created_at.asc()).all()
 
     def save_chat_record(self, session_id, raw_query, clarified_query, answer, confidence):
         """Save a chat record to the database."""

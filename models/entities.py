@@ -13,6 +13,7 @@ class UserSession(Base):
     id = Column(Integer, primary_key=True)
     session_id = Column(String, unique=True, nullable=False)
     persona = Column(String, nullable=False)
+    summary = Column(String, nullable=True)
     created_at = Column(DateTime, server_default=func.now())
     chats = relationship('ChatRecord', back_populates='session')
 
@@ -20,7 +21,7 @@ class UserSession(Base):
 class ChatRecord(Base):
     __tablename__ = "chat_records"
     id = Column(Integer, primary_key=True, index=True)
-    session_id = Column(Integer, ForeignKey("user_sessions.id"))
+    session_id = Column(String, ForeignKey("user_sessions.session_id"))
     raw_query = Column(String)
     clarified_query = Column(String)
     answer = Column(String)

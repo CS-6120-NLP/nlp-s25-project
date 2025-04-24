@@ -17,14 +17,14 @@ def initiate_chat(payload: ChatRequest):
 
     # Process the chat query
     answer, confidence = process_chat(
-        session_id=session.id,
+        session_id=session.session_id,
         raw_query=payload.query
     )
 
-    return ChatResponse(answer=answer, confidence=confidence)
+    return ChatResponse(raw_query=payload.query, answer=answer, confidence=confidence)
 
 
 @router.get("/history", response_model=List[ChatResponse])
 def get_chat_history(payload: ChatHistoryRequest):
     chat_history = get_chat_history_service(payload.session_id)
-    return [ChatResponse(answer=record.answer, confidence=record.confidence) for record in chat_history]
+    return [ChatResponse(raw_query=record.raw_query, answer=record.answer, confidence=record.confidence) for record in chat_history]
