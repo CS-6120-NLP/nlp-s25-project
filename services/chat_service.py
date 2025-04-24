@@ -9,7 +9,7 @@ from repositories.chat_repository import ChatRepository
 from repositories.session_repository import SessionRepository
 from services.llm_service import generate_llm_response, generate_updated_summary
 from services.retrieval_service import retrieve_context
-from services.session_service import get_summary
+from services.session_service import get_session_summary
 
 template = """
 You are a query enrichment assistant working for Northeastern University. 
@@ -46,7 +46,7 @@ def get_chat_history(session_id):
 
 
 def process_chat(session_id, raw_query):
-    prev_summary = get_summary(session_id)
+    prev_summary = get_session_summary(session_id)
     if prev_summary is None:
         prev_summary = ""
 

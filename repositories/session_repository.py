@@ -8,7 +8,7 @@ class SessionRepository:
     def __init__(self):
         self.db = get_db_session()
 
-    def get_summary(self, session_id):
+    def get_session_summary(self, session_id):
         """Retrieve the latest chat summary for a given session ID."""
         session = self.db.query(UserSession).filter_by(session_id=session_id).first()
         if not session:

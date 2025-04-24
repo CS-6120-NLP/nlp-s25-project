@@ -7,7 +7,7 @@ def get_session_history():
     return repo.get_session_history()
 
 
-def get_summary(session_id):
+def get_session_summary(session_id):
     """Retrieve chat summary from the database."""
     repo = SessionRepository()
-    return repo.get_summary(session_id)
+    return repo.get_session_summary(session_id)
