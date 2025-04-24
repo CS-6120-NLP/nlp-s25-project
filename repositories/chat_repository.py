@@ -17,7 +17,11 @@ class ChatRepository:
         session = self.db.query(UserSession).filter_by(session_id=session_id).first()
         if not session:
             print("Session not found:", session_id)
-        return session.chat_summary
+        try:
+            return session.chat_summary
+        except AttributeError:
+            print("Chat summary not found for session:", session_id)
+            return None
 
     def save_chat_record(self, session_id, raw_query, clarified_query, answer, confidence):
         """Save a chat record to the database."""
