@@ -1,5 +1,3 @@
-from typing import List
-
 from models.entities import ChatRecord
 from utils.database import get_db_session
 
@@ -10,12 +8,11 @@ class ChatRepository:
     def __init__(self):
         self.db = get_db_session()
 
-    def get_chat_history(self, session_id: int) -> List[ChatRecord]:
+    def get_chat_history(self, session_id):
         """Retrieve chat records for a given session ID."""
         return self.db.query(ChatRecord).filter(ChatRecord.session_id == session_id).all()
 
-    def save_chat_record(self, session_id: int, raw_query: str, clarified_query: str,
-                         answer: str, confidence: float) -> ChatRecord:
+    def save_chat_record(self, session_id, raw_query, clarified_query, answer, confidence):
         """Save a chat record to the database."""
         record = ChatRecord(
             session_id=session_id,
