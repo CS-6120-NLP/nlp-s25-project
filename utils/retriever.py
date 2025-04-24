@@ -20,7 +20,8 @@ class Retriever:
         if chroma_server_host and chroma_server_port and chroma_server_host.strip() and chroma_server_port.strip():
             self.chroma_client = chromadb.Client(Settings(
                 chroma_server_host=chroma_server_host,
-                chroma_server_http_port=int(chroma_server_port)
+                chroma_server_http_port=int(chroma_server_port),
+                chroma_server_ssl_enabled=True
             ))
         # Otherwise use embedded mode (local development)
         else:
