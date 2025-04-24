@@ -20,6 +20,7 @@ def generate_llm_response(query, context, source, chat_history):
     - If asked for a summary, provide a quick and accurate one.
     - Inject a light, positive tone — like a helpful campus buddy who knows their stuff (but not everything!).
     - Based on the {source}, always provide citations.
+    - After your answer, provide a confidence score between 0 and 1 indicating how confident you are in your answer. Format it exactly as: "[Confidence: 0.85]"
 
     Chat History:
     {formatted_history}

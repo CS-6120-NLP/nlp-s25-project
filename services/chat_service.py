@@ -1,7 +1,10 @@
+import re
+
 from langchain.chains import LLMChain
 from langchain.prompts import PromptTemplate
 
 from clients.llm_client import get_llm
+from config import PERMISSION_THRESHOLD
 from repositories.chat_repository import ChatRepository
 from services.llm_service import generate_llm_response
 from services.retrieval_service import retrieve_context
@@ -58,7 +61,13 @@ def process_chat(session_id, raw_query):
     # Generate response
     result = generate_llm_response(clarified_query, context, source, chat_history)
     answer = result.content if isinstance(result.content, str) else str(result.content)
-    confidence = 0.9
+    confidence_match = re.search(r"\[Confidence:\s*([0-9]*\.?[0-9]+)\]", result)
+    confidence = float(confidence_match.group(1)) if confidence_match else None
+
+    # Low confidence handling
+    if confidence is None or confidence < PERMISSION_THRESHOLD:
+        answer = "I'm not sure about that. Can you please rephrase your question or provide more details?"
+        confidence = 0.0
 
     # Save record
     repo = ChatRepository()
