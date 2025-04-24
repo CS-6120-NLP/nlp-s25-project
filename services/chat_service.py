@@ -5,8 +5,6 @@ from clients.llm_client import get_llm
 from repositories.chat_repository import ChatRepository
 from services.llm_service import generate_llm_response
 from services.retrieval_service import retrieve_context
-from utils.authentication import get_or_create_session
-from utils.database import get_chat_history
 
 template = """
 You are a query enrichment assistant working for Northeastern University. 
@@ -40,9 +38,16 @@ def clarify_query(query, chat_history):
     return llm.invoke(input_text).content.strip()
 
 
-def process_chat(session_id, raw_query, session):
+def get_chat_history(session_id):
+    """Retrieve chat history from the database."""
+    repo = ChatRepository()
+    return repo.get_chat_history(session_id)
+
+
+def process_chat(session_id, raw_query):
     # Retrieve chat history
-    chat_history = [{"role": msg.role, "content": msg.content} for msg in get_chat_history(session.id)]
+    chat_history = [{"raw_query": chat_record.raw_query, "clarified_query": chat_record.clarified_query,
+                     "answer": chat_record.answer} for chat_record in get_chat_history(session_id)]
 
     # Clarify query
     clarified_query = clarify_query(raw_query, chat_history)

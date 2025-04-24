@@ -9,15 +9,10 @@ class ChatRequest(BaseModel):
     session_id: str
     chat_history: Optional[List[Dict[str, str]]] = None
 
-
-class QueryResponse(BaseModel):
-    answer: str
-    confidence: float
-
 class SessionRequest(BaseModel):
     persona: Literal["student", "staff"]
     session_id: str
 
-class SessionResponse(BaseModel):
+class ChatHistoryRequest(BaseModel):
     session_id: str
     persona: Literal["student", "staff"]
