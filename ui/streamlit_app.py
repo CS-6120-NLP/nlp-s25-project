@@ -19,14 +19,14 @@ if st.sidebar.button("Start Session"):
 
 # Past Sessions
 st.sidebar.header("Past Sessions")
-res = requests.get(f"{API_URL}/history/sessions")
+res = requests.get(f"{API_URL}/session/history")
 if res.ok:
     session_history = res.json()
     session_list = []
     for session in session_history:
         session_list.append(session["session_id"] + " (" + session["persona"] + ")")
 
-    selection = st.sidebar.pills(session_list, label="Select a past session:")
+    selection = st.sidebar.pills("Select a past session:", session_list)
     if selection:
         selected_session = selection.split(" (")[0]
         res = requests.post(f"{API_URL}/session", json={"persona": persona, "session_id": selected_session})
@@ -48,16 +48,18 @@ st.header("Chat History")
 chat_history_panel = st.empty()
 
 def load_chat_history():
-    res = requests.get(f"{API_URL}/history/chat", json={"session_id": session_id})
+    res = requests.get(f"{API_URL}/chat/history", json={"session_id": session_id})
     if res.ok:
         chat_history = res.json()
+        st.write(chat_history)
         chat_history_content = ""
         for record in chat_history:
-            chat_history_content += "**You:** " + record.get("raw_query", "") + "\n"
-            chat_history_content += "**Assistant:** " + record.get("answer", "") + " [Confidence: {}]".format(record.get("confidence", "N/A")) + "\n"
+            chat_history_content += "**You:** " + record.get("raw_query", "") + "\n\n"
+            chat_history_content += "**Assistant:** " + record.get("answer", "") + " [Confidence: {}]".format(record.get("confidence", "N/A"))
         chat_history_panel.markdown(chat_history_content)
     else:
-        chat_history_panel.write("(No chat history available.)")
+        # chat_history_panel.write("(No chat history available.)")
+        chat_history_panel.write(res.text)
 
 load_chat_history()
 
@@ -74,5 +76,7 @@ if send_button_event:
             data = res.json()
             bot_response = data.get("answer", "No response")
             load_chat_history()
+            st.write(question_input)
+            st.write(bot_response)
         else:
             st.error(res.text)

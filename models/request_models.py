@@ -11,7 +11,6 @@ class ChatRequest(BaseModel):
 
 class ChatHistoryRequest(BaseModel):
     session_id: str
-    persona: Literal["student", "staff"]
 
 
 class SessionRequest(BaseModel):

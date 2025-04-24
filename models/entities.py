@@ -20,7 +20,7 @@ class UserSession(Base):
 class ChatRecord(Base):
     __tablename__ = "chat_records"
     id = Column(Integer, primary_key=True, index=True)
-    session_id = Column(Integer, ForeignKey("user_sessions.id"))
+    session_id = Column(String, ForeignKey("user_sessions.id"))
     raw_query = Column(String)
     clarified_query = Column(String)
     answer = Column(String)
