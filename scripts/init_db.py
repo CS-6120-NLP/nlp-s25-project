@@ -1,7 +1,7 @@
 # scripts/init_db.py
 
-from utils.database import init_db
+from utils.database import reset_db
 
 if __name__ == "__main__":
-    init_db()
+    reset_db()
     print("✅ Database initialization complete.")

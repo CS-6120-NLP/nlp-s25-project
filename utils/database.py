@@ -17,3 +17,9 @@ def init_db():
 
 def get_db_session():
     return SessionLocal()
+
+
+def reset_db():
+    """Reset the database by dropping all tables and reinitializing."""
+    Base.metadata.drop_all(bind=engine)
+    Base.metadata.create_all(bind=engine)
